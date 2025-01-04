@@ -2,6 +2,22 @@
 
 TextExpander to aplikacja do automatycznego rozwijania skrótów tekstowych, która pozwala na szybkie wstawianie często używanych fraz lub tekstów.
 
+## 📥 Instalacja
+
+1. Przejdź do zakładki [Releases](../../releases)
+2. Pobierz najnowszą wersję `TextExpander-vX.X.X.zip`
+3. Rozpakuj archiwum do wybranego folderu
+4. Uruchom `TextExpander.exe`
+5. Szczegółowa instrukcja znajduje się w pliku `README.txt` w archiwum
+
+## ⚡ Szybki start
+
+1. Po uruchomieniu aplikacja pojawi się w zasobniku systemowym
+2. Kliknij ikonę aby otworzyć główne okno
+3. Dodaj swój pierwszy skrót klikając "Add Shortcut"
+4. Włącz nasłuchiwanie przyciskiem "Start Listening"
+5. Wpisz skrót w dowolnym miejscu i naciśnij spację
+
 ## Funkcje
 
 - **Zarządzanie skrótami**

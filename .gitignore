@@ -1,21 +1,30 @@
-# Visual Studio files
-.vs/
-bin/
-obj/
-*.user
-*.suo
-*.cache
-*.pdb
-
 # Build results
 [Dd]ebug/
 [Rr]elease/
 x64/
 x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-# Log files
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+publish/
+TextExpander-Release/
+*.zip
+
+# Runtime files
 *.log
-
-# Windows specific
-Thumbs.db
-Desktop.ini 
+settings.json
+shortcuts.json
+window_settings.json
+theme.json 
