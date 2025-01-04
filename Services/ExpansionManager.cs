@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using TextExpander.Interfaces;
+using TextExpander.Settings;
 
 namespace TextExpander.Services
 {
@@ -18,13 +19,15 @@ namespace TextExpander.Services
 
         private readonly IShortcutManager _shortcutManager;
         private readonly ILogger _logger;
+        private readonly AppSettings _settings;
         private bool _isInShortcutMode;
         private string _currentShortcut;
 
-        public ExpansionManager(IShortcutManager shortcutManager, ILogger logger)
+        public ExpansionManager(IShortcutManager shortcutManager, ILogger logger, AppSettings settings)
         {
             _shortcutManager = shortcutManager;
             _logger = logger;
+            _settings = settings;
             _isInShortcutMode = false;
             _currentShortcut = string.Empty;
         }
@@ -34,14 +37,20 @@ namespace TextExpander.Services
             _logger.LogDebug($"[ExpansionManager] Otrzymano klawisz: {e.KeyCode}, Control: {e.Control}, Alt: {e.Alt}, Shift: {e.Shift}");
             _logger.LogDebug($"[ExpansionManager] Aktualny stan: TrybSkrótu={_isInShortcutMode}, AktualnySkrót='{_currentShortcut}'");
 
-            // Sprawdź czy wciśnięto Ctrl+M
-            if (e.Control && e.KeyCode == Keys.M)
+            // Sprawdź czy wciśnięto zdefiniowany hotkey
+            bool isHotkeyPressed = 
+                (!_settings.RequireControl || e.Control) &&
+                (!_settings.RequireAlt || e.Alt) &&
+                (!_settings.RequireShift || e.Shift) &&
+                e.KeyCode == _settings.TriggerKey;
+
+            if (isHotkeyPressed)
             {
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 _isInShortcutMode = true;
                 _currentShortcut = string.Empty;
-                _logger.LogDebug("[ExpansionManager] >>> Aktywowano tryb skrótu (Ctrl+M)");
+                _logger.LogDebug($"[ExpansionManager] >>> Aktywowano tryb skrótu ({_settings.GetKeyDescription()})");
                 _logger.LogDebug("[ExpansionManager] >>> Zresetowano bufor skrótu");
                 _logger.LogDebug("[ExpansionManager] >>> Następne klawisze będą zbierane do skrótu");
                 return true;

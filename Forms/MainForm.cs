@@ -29,7 +29,7 @@ namespace TextExpander.Forms
             // Inicjalizacja menedżerów
             var keyboardHook = new GlobalKeyboardHook();
             _stateManager = new ApplicationStateManager(keyboardHook, _logger);
-            _expansionManager = new ExpansionManager(_shortcutManager, _logger);
+            _expansionManager = new ExpansionManager(_shortcutManager, _logger, _settings);
             _listManager = new ShortcutListManager(listViewShortcuts, _shortcutManager);
             _trayManager = new TrayIconManager(this, Icon);
             _hotkeyManager = new HotkeyManager(_settings, _logger, UpdateHotkeyLabel);

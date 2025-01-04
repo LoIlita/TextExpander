@@ -2,5 +2,5 @@
   "TriggerKey": 77,
   "RequireControl": true,
   "RequireAlt": false,
-  "RequireShift": false
+  "RequireShift": true
 }

@@ -103,17 +103,13 @@ namespace TextExpander.Forms
 
         private void PopulateKeysList()
         {
-            var commonKeys = new Keys[] {
+            var letterKeys = new Keys[] {
                 Keys.A, Keys.B, Keys.C, Keys.D, Keys.E, Keys.F, Keys.G, Keys.H, Keys.I, Keys.J,
                 Keys.K, Keys.L, Keys.M, Keys.N, Keys.O, Keys.P, Keys.Q, Keys.R, Keys.S, Keys.T,
-                Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z,
-                Keys.F1, Keys.F2, Keys.F3, Keys.F4, Keys.F5, Keys.F6,
-                Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12,
-                Keys.Space, Keys.Tab, Keys.Insert, Keys.Home, Keys.End,
-                Keys.PageUp, Keys.PageDown
+                Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z
             };
 
-            foreach (Keys key in commonKeys)
+            foreach (Keys key in letterKeys)
             {
                 cmbKey.Items.Add(key);
             }
