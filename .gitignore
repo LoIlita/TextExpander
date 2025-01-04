@@ -1,0 +1,21 @@
+# Visual Studio files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.pdb
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# Log files
+*.log
+
+# Windows specific
+Thumbs.db
+Desktop.ini 
