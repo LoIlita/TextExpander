@@ -1,75 +1,83 @@
 # TextExpander
 
-TextExpander to prosta aplikacja do rozwijania skrótów tekstowych. Pozwala na zdefiniowanie własnych skrótów, które są automatycznie zamieniane na dłuższe frazy podczas pisania.
+TextExpander to aplikacja do automatycznego rozwijania skrótów tekstowych, która pozwala na szybkie wstawianie często używanych fraz lub tekstów.
 
 ## Funkcje
-
-- **Konfigurowalny klawisz aktywacyjny (hotkey)**
-
-  - Możliwość wyboru kombinacji klawiszy (Ctrl/Alt/Shift + litera)
-  - Domyślnie ustawiony na Ctrl+M
 
 - **Zarządzanie skrótami**
 
   - Dodawanie nowych skrótów
   - Edycja istniejących skrótów
   - Usuwanie skrótów
-  - Lista wszystkich skrótów z podglądem ich rozwinięć
+  - Podgląd wszystkich skrótów w przejrzystej tabeli
 
-- **Tryb nasłuchiwania**
+- **Automatyczne rozwijanie**
 
-  - Włączanie/wyłączanie nasłuchiwania klawiszy
-  - Wskaźnik aktualnego stanu nasłuchiwania
+  - Wykrywanie wpisywanych skrótów
+  - Natychmiastowe zastępowanie skrótów pełnym tekstem
+  - Konfigurowalny klawisz aktywacyjny (hotkey)
 
-- **Integracja z systemem**
+- **Interfejs użytkownika**
+
+  - Prosty i intuicyjny interfejs
+  - Tryb jasny i ciemny
+  - Zapamiętywanie pozycji i rozmiaru okna
   - Ikona w zasobniku systemowym
-  - Minimalizacja do zasobnika systemowego
-  - Automatyczne uruchamianie przy starcie systemu
+
+- **Dodatkowe funkcje**
+  - Możliwość włączania/wyłączania nasłuchiwania skrótów
+  - Automatyczne zapisywanie wszystkich ustawień
+  - Szczegółowe logi działania aplikacji
 
 ## Jak używać
 
 1. **Uruchomienie aplikacji**
 
    - Po uruchomieniu aplikacja pojawia się w zasobniku systemowym
-   - Kliknij "Start Listening" aby rozpocząć nasłuchiwanie
+   - Główne okno można zminimalizować - aplikacja działa w tle
 
 2. **Dodawanie skrótów**
 
-   - Kliknij przycisk "Dodaj"
+   - Kliknij przycisk "Add Shortcut"
    - Wpisz skrót i jego rozwinięcie
    - Zatwierdź przyciskiem OK
 
-3. **Używanie skrótów**
+3. **Edycja skrótów**
 
-   - Naciśnij zdefiniowany hotkey (domyślnie Ctrl+M)
-   - Wpisz skrót
-   - Naciśnij spację - skrót zostanie automatycznie zamieniony na jego rozwinięcie
+   - Wybierz skrót z listy
+   - Kliknij przycisk "Edit Shortcut" lub kliknij dwukrotnie na skrót
+   - Zmodyfikuj skrót lub jego rozwinięcie
+   - Zatwierdź zmiany
 
-4. **Zmiana hotkey**
-   - Kliknij przycisk "Zmień hotkey"
-   - Wybierz żądaną kombinację klawiszy (co najmniej jeden modyfikator + litera)
-   - Zatwierdź przyciskiem OK
+4. **Używanie skrótów**
+
+   - Upewnij się, że nasłuchiwanie jest włączone (przycisk "Start Listening")
+   - Wpisz zdefiniowany skrót w dowolnym miejscu
+   - Naciśnij spację, aby rozwinąć skrót
+
+5. **Zmiana motywu**
+
+   - Użyj przycisku zmiany motywu, aby przełączać między jasnym i ciemnym tematem
+   - Wybrany motyw zostanie zapamiętany
+
+6. **Zmiana klawisza aktywacyjnego**
+   - Kliknij przycisk "Change Hotkey"
+   - Wybierz żądaną kombinację klawiszy
+   - Zatwierdź zmiany
 
 ## Wymagania systemowe
 
 - System Windows
-- .NET Framework 6.0 lub nowszy
+- .NET Framework (wersja odpowiednia dla kompilacji)
 
-## Instalacja
+## Pliki konfiguracyjne
 
-1. Pobierz najnowszą wersję aplikacji
-2. Rozpakuj archiwum do wybranego katalogu
-3. Uruchom plik TextExpander.exe
+- `shortcuts.json` - przechowuje zdefiniowane skróty
+- `settings.json` - przechowuje ustawienia aplikacji
+- `textexpander.log` - plik z logami aplikacji
 
-## Konfiguracja
+## Uwagi
 
-- Skróty są zapisywane w pliku `shortcuts.json`
-- Ustawienia aplikacji są zapisywane w pliku `settings.json`
-- Logi aplikacji znajdują się w pliku `textexpander.log`
-
-## Wsparcie
-
-W przypadku problemów lub pytań:
-
-1. Sprawdź logi aplikacji w pliku `textexpander.log`
-2. Zgłoś problem w zakładce Issues na GitHubie
+- Aplikacja musi mieć uprawnienia do nasłuchiwania klawiatury
+- Zalecane jest regularne tworzenie kopii zapasowych pliku ze skrótami
+- W przypadku problemów sprawdź plik logów

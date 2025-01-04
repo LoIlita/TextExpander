@@ -1,36 +1,41 @@
 using System;
-using System.Text;
+using System.IO;
 using TextExpander.Interfaces;
 
 namespace TextExpander.Services
 {
+    /// <summary>
+    /// Implementacja interfejsu ILogger zapisująca logi do pliku.
+    /// Umożliwia rejestrowanie zdarzeń debugowania w pliku tekstowym.
+    /// </summary>
     public class FileLogger : ILogger
     {
-        private readonly string _logPath;
-        private static readonly Encoding _encoding = Encoding.UTF8;
+        private readonly string _logFilePath;
 
-        public FileLogger(string logPath)
+        /// <summary>
+        /// Inicjalizuje nową instancję klasy FileLogger.
+        /// </summary>
+        /// <param name="logFileName">Nazwa pliku, do którego będą zapisywane logi</param>
+        public FileLogger(string logFileName)
         {
-            _logPath = logPath;
-            // Upewnij się, że plik zostanie utworzony z odpowiednim kodowaniem
-            if (!System.IO.File.Exists(logPath))
-            {
-                System.IO.File.WriteAllText(logPath, "", _encoding);
-            }
+            _logFilePath = logFileName;
         }
 
+        /// <summary>
+        /// Zapisuje wiadomość debugowania do pliku logu.
+        /// Każda wiadomość jest poprzedzona znacznikiem czasu.
+        /// </summary>
+        /// <param name="message">Treść wiadomości do zalogowania</param>
         public void LogDebug(string message)
         {
-            var logMessage = $"[{DateTime.Now:HH:mm:ss.fff}] {message}";
-            System.Diagnostics.Debug.WriteLine(logMessage);
-            
             try
             {
-                System.IO.File.AppendAllText(_logPath, logMessage + Environment.NewLine, _encoding);
+                string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [DEBUG] {message}";
+                File.AppendAllText(_logFilePath, logMessage + Environment.NewLine);
             }
             catch
             {
-                // Ignoruj błędy zapisu do pliku
+                // Ignorujemy błędy zapisu do pliku
             }
         }
     }

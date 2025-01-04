@@ -21,7 +21,7 @@ namespace TextExpander.Services
             _currentShortcut = string.Empty;
         }
 
-        public bool HandleKeyPress(KeyEventArgs e, Action<string> logAction)
+        public bool ProcessKeyPress(KeyEventArgs e, Action<string> logAction)
         {
             // Sprawdź czy wciśnięto Ctrl+M
             if (e.Control && e.KeyCode == Keys.M)
@@ -43,7 +43,7 @@ namespace TextExpander.Services
             {
                 e.Handled = true;
                 e.SuppressKeyPress = true;
-                HandleSpacePress(logAction);
+                ProcessSpacePress(logAction);
                 return true;
             }
 
@@ -71,7 +71,7 @@ namespace TextExpander.Services
             return false;
         }
 
-        private void HandleSpacePress(Action<string> logAction)
+        private void ProcessSpacePress(Action<string> logAction)
         {
             try
             {

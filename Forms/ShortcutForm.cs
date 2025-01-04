@@ -3,6 +3,9 @@ using System.Windows.Forms;
 
 namespace TextExpander.Forms
 {
+    /// <summary>
+    /// Formularz do dodawania i edycji skrótów.
+    /// </summary>
     public partial class ShortcutForm : Form
     {
         private TextBox txtShortcut = null!;
@@ -10,22 +13,34 @@ namespace TextExpander.Forms
         private Button btnOK = null!;
         private Button btnCancel = null!;
 
+        /// <summary>
+        /// Pobiera wprowadzony klucz skrótu.
+        /// </summary>
         public string ShortcutKey => txtShortcut.Text.Trim();
+
+        /// <summary>
+        /// Pobiera wprowadzone rozwinięcie skrótu.
+        /// </summary>
         public string ShortcutValue => txtValue.Text.Trim();
 
-        public ShortcutForm(string shortcutKey = "", string shortcutValue = "")
+        /// <summary>
+        /// Inicjalizuje nową instancję formularza ShortcutForm.
+        /// </summary>
+        /// <param name="shortcutKey">Klucz skrótu do edycji. Jeśli pusty, formularz działa w trybie dodawania.</param>
+        /// <param name="shortcutValue">Wartość skrótu do edycji.</param>
+        public ShortcutForm(string? shortcutKey = "", string? shortcutValue = "")
         {
             InitializeComponent();
-            txtShortcut.Text = shortcutKey;
-            txtValue.Text = shortcutValue;
+            txtShortcut.Text = shortcutKey ?? string.Empty;
+            txtValue.Text = shortcutValue ?? string.Empty;
+
             if (!string.IsNullOrEmpty(shortcutKey))
             {
-                txtShortcut.ReadOnly = true;
-                Text = "Edit Shortcut";
+                Text = "Edytuj skrót";
             }
             else
             {
-                Text = "Add Shortcut";
+                Text = "Dodaj skrót";
             }
         }
 
@@ -39,7 +54,7 @@ namespace TextExpander.Forms
 
             var lblShortcut = new Label
             {
-                Text = "Shortcut:",
+                Text = "Skrót:",
                 Location = new System.Drawing.Point(12, 15),
                 Size = new System.Drawing.Size(60, 20)
             };
@@ -52,7 +67,7 @@ namespace TextExpander.Forms
 
             var lblValue = new Label
             {
-                Text = "Value:",
+                Text = "Rozwinięcie:",
                 Location = new System.Drawing.Point(12, 45),
                 Size = new System.Drawing.Size(60, 20)
             };
@@ -76,7 +91,7 @@ namespace TextExpander.Forms
 
             btnCancel = new Button
             {
-                Text = "Cancel",
+                Text = "Anuluj",
                 DialogResult = DialogResult.Cancel,
                 Location = new System.Drawing.Point(297, 120),
                 Size = new System.Drawing.Size(75, 23)
@@ -95,20 +110,32 @@ namespace TextExpander.Forms
             CancelButton = btnCancel;
         }
 
+        /// <summary>
+        /// Obsługuje kliknięcie przycisku OK.
+        /// Sprawdza poprawność wprowadzonych danych przed zamknięciem formularza.
+        /// </summary>
         private void BtnOK_Click(object? sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtShortcut.Text))
             {
-                MessageBox.Show("Shortcut cannot be empty!", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Skrót nie może być pusty!", 
+                    "Błąd walidacji",
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
                 DialogResult = DialogResult.None;
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtValue.Text))
             {
-                MessageBox.Show("Value cannot be empty!", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Rozwinięcie nie może być puste!", 
+                    "Błąd walidacji",
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
                 DialogResult = DialogResult.None;
                 return;
             }

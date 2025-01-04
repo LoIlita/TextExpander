@@ -16,6 +16,8 @@ namespace TextExpander.Forms
         private readonly ShortcutListManager _listManager;
         private readonly TrayIconManager _trayManager;
         private readonly HotkeyManager _hotkeyManager;
+        private readonly ThemeManager _themeManager;
+        private readonly WindowSettings _windowSettings;
 
         public MainForm()
         {
@@ -25,6 +27,7 @@ namespace TextExpander.Forms
             _logger = new FileLogger("textexpander.log");
             _shortcutManager = new JsonShortcutManager("shortcuts.json");
             _settings = AppSettings.Load();
+            _windowSettings = WindowSettings.Load();
 
             // Inicjalizacja menedżerów
             var keyboardHook = new GlobalKeyboardHook();
@@ -33,11 +36,18 @@ namespace TextExpander.Forms
             _listManager = new ShortcutListManager(listViewShortcuts, _shortcutManager);
             _trayManager = new TrayIconManager(this, Icon);
             _hotkeyManager = new HotkeyManager(_settings, _logger, UpdateHotkeyLabel);
+            _themeManager = new ThemeManager(this, _logger);
 
             // Konfiguracja
             SetupEventHandlers();
             _listManager.LoadShortcuts();
             UpdateHotkeyLabel();
+            
+            // Załaduj i zastosuj zapisany motyw
+            _themeManager.ApplyTheme();
+            _logger.LogDebug($"[MainForm] Załadowano motyw: {(ThemeSettings.Instance.IsDarkMode ? "ciemny" : "jasny")}");
+            
+            ApplyWindowSettings();
 
             _logger.LogDebug("MainForm initialization completed");
         }
@@ -46,17 +56,36 @@ namespace TextExpander.Forms
         {
             _stateManager.ListeningStateChanged += OnListeningStateChanged;
             _stateManager.KeyboardHook.KeyDown += OnKeyDown;
+            _themeManager.ThemeChanged += OnThemeChanged;
+        }
+
+        private void OnThemeChanged()
+        {
+            _logger.LogDebug("[MainForm] Zaktualizowano motyw");
+        }
+
+        private void BtnChangeTheme_Click(object? sender, EventArgs e)
+        {
+            _logger.LogDebug("[MainForm] Kliknięto przycisk zmiany motywu");
+            _themeManager.ToggleTheme();
         }
 
         private void OnListeningStateChanged(bool isListening)
         {
             btnToggleListening.Text = isListening ? "Stop Listening" : "Start Listening";
-            MessageBox.Show(
-                isListening ? "Nasłuchiwanie zostało włączone" : "Nasłuchiwanie zostało wyłączone",
-                "Status",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information
-            );
+            
+            if (isListening)
+            {
+                btnToggleListening.BackColor = System.Drawing.Color.LightGreen;
+                btnToggleListening.ForeColor = System.Drawing.Color.DarkGreen;
+                btnToggleListening.Font = new System.Drawing.Font(btnToggleListening.Font, System.Drawing.FontStyle.Bold);
+            }
+            else
+            {
+                // Przywróć kolory zgodne z aktualnym motywem
+                _themeManager.ApplyTheme();
+                btnToggleListening.Font = new System.Drawing.Font(btnToggleListening.Font, System.Drawing.FontStyle.Regular);
+            }
         }
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -65,7 +94,10 @@ namespace TextExpander.Forms
             {
                 _logger.LogDebug($"[MainForm] Przechwycono klawisz: {e.KeyCode}");
                 _logger.LogDebug($"[MainForm] Stan nasłuchiwania: aktywny");
-                var handled = _expansionManager.HandleKeyPress(e);
+                _logger.LogDebug($"[MainForm] Hotkey: {_settings.GetKeyDescription()}");
+                _logger.LogDebug($"[MainForm] Control: {e.Control}, Alt: {e.Alt}, Shift: {e.Shift}");
+                
+                var handled = _expansionManager.ProcessKeyPress(e);
                 _logger.LogDebug($"[MainForm] Klawisz {(handled ? "został obsłużony" : "nie został obsłużony")}");
             }
             else
@@ -85,6 +117,7 @@ namespace TextExpander.Forms
         {
             _logger.LogDebug("[MainForm] Kliknięto przycisk przełączania nasłuchiwania");
             _stateManager.ToggleListening();
+            _logger.LogDebug($"[MainForm] Stan nasłuchiwania po przełączeniu: {(_stateManager.IsListening ? "aktywny" : "nieaktywny")}");
         }
 
         private void BtnChangeHotkey_Click(object? sender, EventArgs e)
@@ -129,7 +162,7 @@ namespace TextExpander.Forms
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    _listManager.UpdateShortcut(selectedKey, form.ShortcutValue);
+                    _listManager.UpdateShortcut(selectedKey, form.ShortcutKey, form.ShortcutValue);
                 }
             }
         }
@@ -149,10 +182,33 @@ namespace TextExpander.Forms
             }
         }
 
+        private void ApplyWindowSettings()
+        {
+            if (_windowSettings.IsMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                Location = _windowSettings.Location;
+                Size = _windowSettings.Size;
+            }
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             try
             {
+                // Zapisz ustawienia okna
+                _windowSettings.IsMaximized = (WindowState == FormWindowState.Maximized);
+                if (WindowState == FormWindowState.Normal)
+                {
+                    _windowSettings.Location = Location;
+                    _windowSettings.Size = Size;
+                }
+                _windowSettings.Save();
+
+                // Zapisz pozostałe ustawienia
                 _stateManager.StopListening();
                 _settings.Save();
                 _shortcutManager.SaveShortcuts();
@@ -169,6 +225,26 @@ namespace TextExpander.Forms
             finally
             {
                 base.OnFormClosing(e);
+            }
+        }
+
+        protected override void OnResizeEnd(EventArgs e)
+        {
+            base.OnResizeEnd(e);
+            if (WindowState == FormWindowState.Normal)
+            {
+                _windowSettings.Size = Size;
+                _windowSettings.Save();
+            }
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            base.OnLocationChanged(e);
+            if (WindowState == FormWindowState.Normal)
+            {
+                _windowSettings.Location = Location;
+                _windowSettings.Save();
             }
         }
 

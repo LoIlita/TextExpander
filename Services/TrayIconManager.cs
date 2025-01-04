@@ -4,60 +4,85 @@ using System.Windows.Forms;
 
 namespace TextExpander.Services
 {
+    /// <summary>
+    /// Klasa zarządzająca ikoną w zasobniku systemowym.
+    /// Umożliwia interakcję z aplikacją poprzez menu kontekstowe w zasobniku.
+    /// </summary>
     public class TrayIconManager : IDisposable
     {
         private readonly NotifyIcon _trayIcon;
-        private readonly Form _parentForm;
+        private readonly Form _mainForm;
 
-        public TrayIconManager(Form parentForm, Icon? icon)
+        /// <summary>
+        /// Inicjalizuje nową instancję klasy TrayIconManager.
+        /// </summary>
+        /// <param name="mainForm">Główne okno aplikacji</param>
+        /// <param name="icon">Ikona do wyświetlenia w zasobniku. Jeśli null, zostanie użyta domyślna ikona aplikacji.</param>
+        /// <exception cref="ArgumentNullException">Rzucany gdy mainForm jest null</exception>
+        public TrayIconManager(Form mainForm, Icon? icon)
         {
-            _parentForm = parentForm ?? throw new ArgumentNullException(nameof(parentForm));
+            _mainForm = mainForm ?? throw new ArgumentNullException(nameof(mainForm));
             
-            if (icon == null)
-            {
-                // Użyj domyślnej ikony aplikacji, jeśli nie podano własnej
-                icon = SystemIcons.Application;
-            }
-
             _trayIcon = new NotifyIcon
             {
-                Icon = icon,
+                Icon = icon ?? SystemIcons.Application,
                 Text = "TextExpander",
-                Visible = true
+                Visible = true,
+                ContextMenuStrip = CreateContextMenu()
             };
-            SetupContextMenu();
+
+            _trayIcon.DoubleClick += TrayIcon_DoubleClick;
         }
 
-        private void SetupContextMenu()
+        /// <summary>
+        /// Tworzy menu kontekstowe dla ikony w zasobniku.
+        /// </summary>
+        /// <returns>Menu kontekstowe z opcjami aplikacji</returns>
+        private ContextMenuStrip CreateContextMenu()
         {
-            var contextMenu = new ContextMenuStrip();
-            var showItem = new ToolStripMenuItem("Pokaż");
-            showItem.Click += ShowForm;
+            var menu = new ContextMenuStrip();
+            var showItem = new ToolStripMenuItem("Pokaż", null, ShowItem_Click);
+            var exitItem = new ToolStripMenuItem("Zakończ", null, ExitItem_Click);
 
-            var exitItem = new ToolStripMenuItem("Zakończ");
-            exitItem.Click += ExitApplication;
+            menu.Items.Add(showItem);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(exitItem);
 
-            contextMenu.Items.Add(showItem);
-            contextMenu.Items.Add(exitItem);
-            _trayIcon.ContextMenuStrip = contextMenu;
-            _trayIcon.DoubleClick += ShowForm;
+            return menu;
         }
 
-        private void ShowForm(object? sender, EventArgs e)
+        /// <summary>
+        /// Obsługuje zdarzenie kliknięcia w opcję "Pokaż" w menu kontekstowym.
+        /// </summary>
+        private void ShowItem_Click(object? sender, EventArgs e)
         {
-            _parentForm.Show();
-            _parentForm.WindowState = FormWindowState.Normal;
+            _mainForm.Show();
+            _mainForm.WindowState = FormWindowState.Normal;
+            _mainForm.Activate();
         }
 
-        private void ExitApplication(object? sender, EventArgs e)
+        /// <summary>
+        /// Obsługuje zdarzenie kliknięcia w opcję "Zakończ" w menu kontekstowym.
+        /// </summary>
+        private void ExitItem_Click(object? sender, EventArgs e)
         {
-            _trayIcon.Visible = false;
             Application.Exit();
         }
 
+        /// <summary>
+        /// Obsługuje zdarzenie podwójnego kliknięcia w ikonę w zasobniku.
+        /// </summary>
+        private void TrayIcon_DoubleClick(object? sender, EventArgs e)
+        {
+            ShowItem_Click(sender, e);
+        }
+
+        /// <summary>
+        /// Zwalnia zasoby używane przez ikonę w zasobniku.
+        /// </summary>
         public void Dispose()
         {
-            _trayIcon?.Dispose();
+            _trayIcon.Dispose();
         }
     }
 } 

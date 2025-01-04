@@ -6,103 +6,113 @@ using TextExpander.Interfaces;
 
 namespace TextExpander.Services
 {
+    /// <summary>
+    /// Implementacja menedżera skrótów wykorzystująca format JSON do przechowywania danych.
+    /// Zarządza zapisem i odczytem skrótów z pliku JSON oraz operacjami na skrótach.
+    /// </summary>
     public class JsonShortcutManager : IShortcutManager
     {
-        private Dictionary<string, string> _shortcuts;
         private readonly string _filePath;
+        private readonly Dictionary<string, string> _shortcuts;
 
+        /// <summary>
+        /// Inicjalizuje nową instancję klasy JsonShortcutManager.
+        /// </summary>
+        /// <param name="filePath">Ścieżka do pliku JSON ze skrótami</param>
         public JsonShortcutManager(string filePath)
         {
             _filePath = filePath;
-            _shortcuts = new Dictionary<string, string>();
+            _shortcuts = LoadShortcutsFromFile();
         }
 
+        /// <summary>
+        /// Pobiera wartość rozwinięcia dla podanego skrótu.
+        /// </summary>
+        /// <param name="shortcut">Skrót do wyszukania</param>
+        /// <returns>Rozwinięcie skrótu lub null, jeśli skrót nie istnieje</returns>
+        public string? GetShortcutValue(string shortcut)
+        {
+            return _shortcuts.TryGetValue(shortcut, out string? value) ? value : null;
+        }
+
+        /// <summary>
+        /// Dodaje nowy skrót z jego rozwinięciem.
+        /// </summary>
+        /// <param name="shortcut">Skrót do dodania</param>
+        /// <param name="value">Rozwinięcie skrótu</param>
+        /// <returns>True jeśli dodano pomyślnie, False jeśli skrót już istnieje</returns>
+        public bool AddShortcut(string shortcut, string value)
+        {
+            if (_shortcuts.ContainsKey(shortcut))
+                return false;
+
+            _shortcuts[shortcut] = value;
+            return true;
+        }
+
+        /// <summary>
+        /// Usuwa skrót z systemu.
+        /// </summary>
+        /// <param name="shortcut">Skrót do usunięcia</param>
+        public void DeleteShortcut(string shortcut)
+        {
+            _shortcuts.Remove(shortcut);
+        }
+
+        /// <summary>
+        /// Aktualizuje rozwinięcie dla istniejącego skrótu.
+        /// </summary>
+        /// <param name="shortcut">Skrót do zaktualizowania</param>
+        /// <param name="newValue">Nowe rozwinięcie skrótu</param>
+        public void UpdateShortcut(string shortcut, string newValue)
+        {
+            if (_shortcuts.ContainsKey(shortcut))
+            {
+                _shortcuts[shortcut] = newValue;
+                SaveShortcuts();
+            }
+        }
+
+        /// <summary>
+        /// Pobiera wszystkie zdefiniowane skróty i ich rozwinięcia.
+        /// </summary>
+        /// <returns>Słownik zawierający pary skrót-rozwinięcie</returns>
         public Dictionary<string, string> GetAllShortcuts()
         {
             return new Dictionary<string, string>(_shortcuts);
         }
 
-        public bool AddShortcut(string key, string value)
-        {
-            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
-                return false;
-
-            if (_shortcuts.ContainsKey(key))
-                return false;
-
-            _shortcuts.Add(key, value);
-            return true;
-        }
-
-        public bool RemoveShortcut(string key)
-        {
-            return _shortcuts.Remove(key);
-        }
-
-        public bool UpdateShortcut(string key, string newValue)
-        {
-            if (!_shortcuts.ContainsKey(key))
-                return false;
-
-            _shortcuts[key] = newValue;
-            return true;
-        }
-
-        public string GetShortcutValue(string key)
-        {
-            return _shortcuts.TryGetValue(key, out string value) ? value : string.Empty;
-        }
-
+        /// <summary>
+        /// Zapisuje wszystkie skróty do pliku JSON.
+        /// </summary>
         public void SaveShortcuts()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(_shortcuts, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(_filePath, json);
-            }
-            catch (Exception ex)
-            {
-                // W prawdziwej aplikacji należałoby dodać odpowiednie logowanie błędów
-                System.Diagnostics.Debug.WriteLine($"Error saving shortcuts: {ex.Message}");
-            }
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(_shortcuts, options);
+            File.WriteAllText(_filePath, jsonString);
         }
 
-        public void LoadShortcuts()
+        /// <summary>
+        /// Wczytuje skróty z pliku JSON.
+        /// </summary>
+        /// <returns>Słownik zawierający wczytane skróty i ich rozwinięcia</returns>
+        private Dictionary<string, string> LoadShortcutsFromFile()
         {
+            if (!File.Exists(_filePath))
+            {
+                return new Dictionary<string, string>();
+            }
+
             try
             {
-                if (File.Exists(_filePath))
-                {
-                    string json = File.ReadAllText(_filePath);
-                    _shortcuts = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>();
-                }
-                else
-                {
-                    // Domyślne skróty
-                    _shortcuts = new Dictionary<string, string>
-                    {
-                        { "@mail", "example@email.com" },
-                        { "@tel", "+48 123 456 789" },
-                        { "@lorem", "Lorem ipsum dolor sit amet" }
-                    };
-                    SaveShortcuts();
-                }
+                string jsonString = File.ReadAllText(_filePath);
+                var shortcuts = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
+                return shortcuts ?? new Dictionary<string, string>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // W prawdziwej aplikacji należałoby dodać odpowiednie logowanie błędów
-                System.Diagnostics.Debug.WriteLine($"Error loading shortcuts: {ex.Message}");
-                _shortcuts = new Dictionary<string, string>();
+                return new Dictionary<string, string>();
             }
-        }
-
-        public string? GetExpansion(string shortcut)
-        {
-            if (_shortcuts.TryGetValue(shortcut, out string? value))
-            {
-                return value;
-            }
-            return null;
         }
     }
 } 

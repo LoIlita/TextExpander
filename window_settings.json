@@ -1,0 +1,13 @@
+{
+  "Location": {
+    "IsEmpty": false,
+    "X": 660,
+    "Y": 300
+  },
+  "Size": {
+    "IsEmpty": false,
+    "Width": 600,
+    "Height": 440
+  },
+  "IsMaximized": false
+}
